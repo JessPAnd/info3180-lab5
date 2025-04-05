@@ -24,8 +24,6 @@ def index():
     return jsonify(message="This is the beginning of our API")
 
 
-
-
 @app.route( '/api/v1/movies', methods=['POST'])
 def movies():
     if request.method == 'POST':
@@ -116,3 +114,17 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
+
+@app.route('/api/v1/movies', methods=['GET'])
+def get_movies():
+    movies = Movie.query.all()
+    movies_list = [
+        {
+            'id': movie.id,
+            'title': movie.title,
+            'description': movie.description,
+            'poster': f"/api/v1/posters/{movie.poster}"
+        } for movie in movies
+    ]
+    return jsonify({'movies': movies_list})
