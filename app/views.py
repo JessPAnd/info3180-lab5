@@ -31,7 +31,13 @@ def movies():
         if form.validate_on_submit():
             file = request.files['poster']
             filename = str(uuid.uuid4()) + os.path.splitext(file.filename)[1]
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            # Ensure the upload folder exists
+            upload_folder = app.config['UPLOAD_FOLDER']
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            
+            file.save(os.path.join(upload_folder, filename))
             
             movie = Movie(
                 title=form.title.data,
