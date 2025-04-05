@@ -53,7 +53,7 @@ def movies():
         })
     else:
         errors = form_errors(form)
-        return jsonify({'errors': errors})
+        return jsonify({'errors': errors}), 400
 
 
 @app.route('/api/v1/posters/<filename>')

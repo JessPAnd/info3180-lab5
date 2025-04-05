@@ -31,52 +31,52 @@ let csrf_token = ref('');
 let message = ref('');
 let errors = ref([]);
 let formData = ref({
-  title: '',
-  description: '',
-  poster: null
+    title: '',
+    description: '',
+    poster: null
 });
 
 function getCsrfToken() {
-  fetch('/api/v1/csrf-token')
-    .then(response => response.json())
-    .then(data => {
-      csrf_token.value = data.csrf_token;
-    });
+    fetch('/api/v1/csrf-token')
+        .then(response => response.json())
+        .then(data => {
+            csrf_token.value = data.csrf_token;
+        });
 }
 
 function handleFileUpload(event) {
-  formData.value.poster = event.target.files[0];
+    formData.value.poster = event.target.files[0];
 }
 
 function saveMovie() {
-  let form_data = new FormData();
-  form_data.append('title', formData.value.title);
-  form_data.append('description', formData.value.description);
-  form_data.append('poster', formData.value.poster);
+    let form_data = new FormData();
+    form_data.append('title', formData.value.title);
+    form_data.append('description', formData.value.description);
+    form_data.append('poster', formData.value.poster);
 
-  fetch('/api/v1/movies', {
-    method: 'POST',
-    body: form_data,
-    headers: {
-      'X-CSRFToken': csrf_token.value
-    }
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.message) {
-        message.value = data.message;
-        errors.value = [];
-      } else if (data.errors) {
-        message.value = '';
-        errors.value = data.errors;
-      }
+    fetch('/api/v1/movies', {
+        method: 'POST',
+        body: form_data,
+        headers: {
+            'X-CSRFToken': csrf_token.value
+        }
     })
-    .catch(error => {
-      console.log(error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                message.value = data.message;
+                errors.value = [];
+            } else if (data.errors) {
+                message.value = '';
+                errors.value = data.errors;
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        });
 }
 
 onMounted(() => {
-  getCsrfToken();
+    getCsrfToken();
 });
 </script>
