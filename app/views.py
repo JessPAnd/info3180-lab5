@@ -26,49 +26,36 @@ def index():
 
 @app.route( '/api/v1/movies', methods=['POST'])
 def movies():
-    if request.method == 'POST':
-        form = MovieForm()
-        if form.validate_on_submit():
-            file = request.files['poster']
-            filename = str(uuid.uuid4()) + os.path.splitext(file.filename)[1]
-            
-            # Ensure the upload folder exists
-            upload_folder = app.config['UPLOAD_FOLDER']
-            if not os.path.exists(upload_folder):
-                os.makedirs(upload_folder)
-            
-            file.save(os.path.join(upload_folder, filename))
-            
-            movie = Movie(
-                title=form.title.data,
-                description=form.description.data,
-                poster=filename
-            )
-            db.session.add(movie)
-            db.session.commit()
-            
-            return jsonify({
-                'message': 'Movie Successfully added',
-                'title': movie.title,
-                'poster': filename,
-                'description': movie.description
-            })
-        else:
-            errors = form_errors(form)
-            return jsonify({'errors': errors})
-    else:  # GET
-        movies = Movie.query.all()
-        movies_list = [
-            {
-                'id': movie.id,
-                'title': movie.title,
-                'description': movie.description,
-                'poster': f"/api/v1/posters/{movie.poster}"
-            } for movie in movies
-        ]
-        return jsonify({'movies': movies_list})
- 
- 
+    form = MovieForm()
+    if form.validate_on_submit():
+        file = request.files['poster']
+        filename = str(uuid.uuid4()) + os.path.splitext(file.filename)[1]
+        
+        upload_folder = app.config['UPLOAD_FOLDER']
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
+        
+        file.save(os.path.join(upload_folder, filename))
+        
+        movie = Movie(
+            title=form.title.data,
+            description=form.description.data,
+            poster=filename
+        )
+        db.session.add(movie)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Movie Successfully added',
+            'title': movie.title,
+            'poster': filename,
+            'description': movie.description
+        })
+    else:
+        errors = form_errors(form)
+        return jsonify({'errors': errors})
+
+
 @app.route('/api/v1/posters/<filename>')
 def get_poster(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
